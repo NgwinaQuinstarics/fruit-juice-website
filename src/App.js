@@ -1,450 +1,354 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
 
-const WHATSAPP_NUMBER = '237674681144';
+const WA = '237674681144';
+const wa = (msg) => `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
 
-const juices = [
-  {
-    id: 1,
-    name: 'Watermelon Burst',
-    description: 'Refreshing, hydrating & naturally sweet — straight from the fruit.',
-    price: '500 – 1500 FCFA',
-    color: '#f87171',
-    bg: '#fff1f1',
-    emoji: '🍉',
-    tag: 'Best Seller',
-  },
-  {
-    id: 2,
-    name: 'Tropical Mango',
-    description: 'Creamy, rich mango goodness. Pure sunshine in every sip.',
-    price: '500 – 1500 FCFA',
-    color: '#f59e0b',
-    bg: '#fffbeb',
-    emoji: '🥭',
-    tag: 'Fan Favourite',
-  },
-  {
-    id: 3,
-    name: 'Pineapple Zest',
-    description: 'Tangy & sweet pineapple pressed fresh — energising & digestive.',
-    price: '500 – 1500 FCFA',
-    color: '#eab308',
-    bg: '#fefce8',
-    emoji: '🍍',
-    tag: null,
-  },
-  {
-    id: 4,
-    name: 'Orange Sunshine',
-    description: 'Vitamin C-packed, freshly squeezed oranges. Start your day right.',
-    price: '500 – 1500 FCFA',
-    color: '#f07c1a',
-    bg: '#fff7ed',
-    emoji: '🍊',
-    tag: null,
-  },
-  {
-    id: 5,
-    name: 'Ginger-Lemon Boost',
-    description: 'A spicy, zesty immune booster with real ginger & fresh lemon.',
-    price: '500 – 1500 FCFA',
-    color: '#84cc16',
-    bg: '#f7fee7',
-    emoji: '🍋',
-    tag: 'Healthy Pick',
-  },
-  {
-    id: 6,
-    name: 'Mixed Fruit Blend',
-    description: 'A vibrant medley of seasonal fruits. A new taste every time.',
-    price: '500 – 2000 FCFA',
-    color: '#a855f7',
-    bg: '#faf5ff',
-    emoji: '🍇',
-    tag: null,
-  },
+const JUICES = [
+  { id:1, name:'Watermelon Burst', tagline:'Hydrating & cooling', desc:'Sweet, ripe watermelon cold-pressed to keep every drop of goodness alive.', priceRange:'500 – 1,500 FCFA', color:'#d94f5c', light:'#fdf0f1', border:'rgba(217,79,92,0.15)', emoji:'🍉', img:'https://images.unsplash.com/photo-1589733955941-5eeaf752f6dd?w=600&q=85&auto=format', badge:'Best Seller', badgeColor:'#d94f5c' },
+  { id:2, name:'Golden Mango', tagline:'Rich & velvety', desc:'Sun-ripened Cameroonian mangoes blended into liquid gold. Thick and dreamy.', priceRange:'500 – 1,500 FCFA', color:'#e8901a', light:'#fff9ee', border:'rgba(232,144,26,0.15)', emoji:'🥭', img:'https://images.unsplash.com/photo-1546173159-315724a31696?w=600&q=85&auto=format', badge:'Fan Favourite', badgeColor:'#e8901a' },
+  { id:3, name:'Citrus Sunrise', tagline:'Bright & zesty', desc:'Fresh-squeezed oranges and a hint of lemon. A vitamin C powerhouse for your morning.', priceRange:'500 – 1,500 FCFA', color:'#d97706', light:'#fffbf0', border:'rgba(217,119,6,0.15)', emoji:'🍊', img:'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=600&q=85&auto=format', badge:null, badgeColor:null },
+  { id:4, name:'Tropical Pineapple', tagline:'Tangy & digestive', desc:'Fresh pineapple with a natural tang. Great for digestion and a natural energy lift.', priceRange:'500 – 1,500 FCFA', color:'#b5890a', light:'#fefce8', border:'rgba(181,137,10,0.15)', emoji:'🍍', img:'https://images.unsplash.com/photo-1453830906880-1b7d53e4ea29?w=600&q=85&auto=format', badge:null, badgeColor:null },
+  { id:5, name:'Ginger Lemon Boost', tagline:'Spicy immune booster', desc:'Raw ginger, fresh lemon and a touch of honey. Your daily wellness ritual in a glass.', priceRange:'500 – 1,500 FCFA', color:'#15803d', light:'#f0fdf4', border:'rgba(21,128,61,0.15)', emoji:'🍋', img:'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&q=85&auto=format', badge:'Healthy Pick', badgeColor:'#15803d' },
+  { id:6, name:'Passion Fruit Mix', tagline:'Exotic & floral', desc:'A blended medley of passion fruit and seasonal favourites. Unique and vibrant every time.', priceRange:'500 – 2,000 FCFA', color:'#7c3aed', light:'#faf5ff', border:'rgba(124,58,237,0.15)', emoji:'🍇', img:'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=600&q=85&auto=format', badge:"Chef's Special", badgeColor:'#7c3aed' },
 ];
 
-const whatsappLink = (msg) =>
-  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+const TICKER = ['🍉 Watermelon Burst','🥭 Golden Mango','🍊 Citrus Sunrise','🍍 Tropical Pineapple','🍋 Ginger Lemon Boost','🍇 Passion Fruit Mix','✨ 100% Natural','🚚 Delivery Available','🎉 Bulk Event Orders','🌿 Zero Preservatives','💚 Made Fresh Daily'];
 
-function useInView(threshold = 0.15) {
+function useInView(threshold = 0.12) {
   const ref = useRef(null);
-  const [inView, setInView] = useState(false);
+  const [v, setV] = useState(false);
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true); },
-      { threshold }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    const el = ref.current; if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setV(true); obs.disconnect(); } }, { threshold });
+    obs.observe(el);
+    return () => obs.disconnect();
   }, [threshold]);
-  return [ref, inView];
+  return [ref, v];
 }
 
-// ── NAVBAR ──────────────────────────────────────────────────────────────
+/* SVG Icons */
+const IconWA = ({ s = 20 }) => (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.117.549 4.107 1.512 5.84L.057 23.428a.75.75 0 00.906.975l5.7-1.496A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.007-1.367l-.36-.214-3.723.977.993-3.63-.235-.374A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
+  </svg>
+);
+const IconPhone = ({ s = 18 }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 10.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92v2z"/></svg>;
+const IconMap  = ({ s = 16 }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>;
+const IconStar = ({ s = 14 }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
+const IconArr  = ({ s = 15 }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>;
+const IconLeaf = ({ s = 16 }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 014.001 13C4 7 10 5 12 2c2 3 8 5 8 11a7 7 0 01-7 7z"/><path d="M12 2v18"/></svg>;
+const IconTruck= ({ s = 18 }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>;
+const IconGlass= ({ s = 18 }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="9 22 12 22 15 22"/><polyline points="19 2 5 2 7 13.5 17 13.5 19 2"/><line x1="12" y1="22" x2="12" y2="13.5"/></svg>;
+const IconCal  = ({ s = 18 }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
+const IconCheck= ({ s = 14 }) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>;
+
+/* ── NAVBAR ─────────────────────────────────────────── */
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-
+  const [open, setOpen] = useState(false);
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
+    const fn = () => setScrolled(window.scrollY > 56);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
   }, []);
-
-  const links = [
-    { label: 'Home', href: '#hero' },
-    { label: 'Our Juices', href: '#juices' },
-    { label: 'Events', href: '#events' },
-    { label: 'Delivery', href: '#delivery' },
-    { label: 'Order Now', href: '#order' },
-  ];
-
+  const close = useCallback(() => setOpen(false), []);
+  const links = [{ label:'Our Juices', href:'#juices' }, { label:'Events', href:'#events' }, { label:'Delivery', href:'#delivery' }, { label:'Contact', href:'#contact' }];
   return (
-    <nav className={`navbar${scrolled ? ' scrolled' : ''}`}>
-      <div className="navbar-inner">
-        <a href="#hero" className="navbar-brand">
-          <span className="brand-leaf">🍃</span>
-          <span className="brand-name">Grace's<em> Juices</em></span>
-        </a>
-        <ul className={`navbar-links${menuOpen ? ' open' : ''}`}>
-          {links.map((l) => (
-            <li key={l.label}>
-              <a href={l.href} onClick={() => setMenuOpen(false)}>{l.label}</a>
-            </li>
-          ))}
-        </ul>
-        <a
-          href={whatsappLink('Hello Grace! I want to order a juice 🍹')}
-          target="_blank"
-          rel="noreferrer"
-          className="btn btn-wa navbar-cta"
-        >
-          <WaIcon /> WhatsApp
-        </a>
-        <button
-          className={`hamburger${menuOpen ? ' active' : ''}`}
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          <span /><span /><span />
-        </button>
-      </div>
-    </nav>
+    <>
+      <nav className={`navbar${scrolled?' scrolled':''}`}>
+        <div className="nb-wrap">
+          <a href="#top" className="nb-brand" onClick={close}>
+            <span className="nb-brand-icon"><IconLeaf s={16}/></span>
+            <span>Grace's<em> Juices</em></span>
+          </a>
+          <ul className={`nb-links${open?' open':''}`}>
+            {links.map(l => <li key={l.label}><a href={l.href} className="nb-link" onClick={close}>{l.label}</a></li>)}
+          </ul>
+          <div className="nb-right">
+            <a href={wa('Hello Grace! I want to order 🍹')} target="_blank" rel="noreferrer" className="btn btn-wa nb-cta">
+              <IconWA s={15}/> Order Now
+            </a>
+            <button className={`hbg${open?' hbg-x':''}`} onClick={() => setOpen(o=>!o)} aria-label="Menu">
+              <span/><span/><span/>
+            </button>
+          </div>
+        </div>
+        {open && (
+          <div className="mob-menu">
+            {links.map(l => <a key={l.label} href={l.href} className="mob-link" onClick={close}>{l.label}</a>)}
+            <a href={wa('Hello Grace! I want to order 🍹')} target="_blank" rel="noreferrer" className="btn btn-wa mob-wa" onClick={close}>
+              <IconWA s={18}/> Order on WhatsApp
+            </a>
+          </div>
+        )}
+      </nav>
+      <div className="ticker"><div className="ticker-track">{[...TICKER,...TICKER].map((t,i)=><span key={i} className="ticker-item">{t}</span>)}</div></div>
+    </>
   );
 }
 
-// ── HERO ────────────────────────────────────────────────────────────────
+/* ── HERO ───────────────────────────────────────────── */
 function Hero() {
   return (
-    <section className="hero" id="hero">
-      <div className="hero-bg-blobs">
-        <div className="blob blob1" />
-        <div className="blob blob2" />
-        <div className="blob blob3" />
+    <section className="hero" id="top">
+      <div className="hero-bg">
+        <div className="blob b1"/><div className="blob b2"/><div className="blob b3"/>
+        <div className="hero-grain"/>
       </div>
-      <div className="hero-content animate-fade-up">
-        <div className="hero-badge delay-1 animate-fade-up">
-          🌿 100% Natural · No Preservatives · Made with Love
-        </div>
-        <h1 className="hero-title delay-2 animate-fade-up">
-          Fresh Fruit Juices<br />
-          <em>Straight from Nature</em>
-        </h1>
-        <p className="hero-subtitle delay-3 animate-fade-up">
-          Hi, I'm <strong>Grace</strong> 👋 — I press the freshest, most delicious natural
-          juices in <strong>Yaoundé Simbock</strong>. Order via WhatsApp &amp; I'll deliver
-          right to you!
-        </p>
-        <div className="hero-actions delay-4 animate-fade-up">
-          <a
-            href={whatsappLink('Hello Grace! I want to order a juice 🍹')}
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-primary"
-          >
-            <WaIcon /> Order on WhatsApp
-          </a>
-          <a href="#juices" className="btn btn-outline">See Our Juices ↓</a>
-        </div>
-        <div className="hero-stats delay-5 animate-fade-up">
-          <div className="stat">
-            <span className="stat-num">100%</span>
-            <span className="stat-lbl">Natural</span>
+      <div className="hero-wrap">
+        <div className="hero-text">
+          <div className="hero-pill"><span className="pill-dot"/><span>Fresh daily — Yaoundé, Simbock</span></div>
+          <h1 className="hero-h1">Nature's Finest<br/><em>In Every Sip</em></h1>
+          <p className="hero-p">Hi, I'm <strong>Grace</strong> — I press the freshest 100% natural fruit juices in Yaoundé. No preservatives, no shortcuts. Just pure fruit and love.</p>
+          <div className="hero-chips">
+            {[{i:<IconLeaf s={13}/>,l:'100% Natural'},{i:<IconTruck s={13}/>,l:'Delivery'},{i:<IconCal s={13}/>,l:'Events'}].map(c=>(
+              <span key={c.l} className="hero-chip">{c.i}{c.l}</span>
+            ))}
           </div>
-          <div className="stat-divider" />
-          <div className="stat">
-            <span className="stat-num">🚚</span>
-            <span className="stat-lbl">Delivery</span>
+          <div className="hero-btns">
+            <a href={wa('Hello Grace! I want to order a fresh juice 🍹')} target="_blank" rel="noreferrer" className="btn btn-wa btn-hero">
+              <IconWA s={20}/> Order on WhatsApp
+            </a>
+            <a href="#juices" className="btn btn-ghost">View Juices <IconArr s={14}/></a>
           </div>
-          <div className="stat-divider" />
-          <div className="stat">
-            <span className="stat-num">🎉</span>
-            <span className="stat-lbl">Events</span>
+          <div className="hero-trust">
+            <div className="stars">{[1,2,3,4,5].map(i=><span key={i} className="star"><IconStar s={13}/></span>)}</div>
+            <span className="trust-lbl">Loved by customers across Yaoundé</span>
           </div>
         </div>
-      </div>
-      <div className="hero-visual animate-fade-up delay-3">
-        <div className="hero-img-wrap">
-          {/* REPLACE: swap this src with your actual juice photo */}
-          <img
-            src="https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=600&q=80"
-            alt="Fresh natural juices by Grace"
-            className="hero-img"
-          />
-          <div className="hero-img-badge">
-            <span className="pulse-dot" />
-            Fresh daily
+        <div className="hero-vis">
+          <div className="hero-frame">
+            {/* REPLACE: swap with your real hero photo */}
+            <img src="https://images.unsplash.com/photo-1622597467836-f3285f2131b8?w=700&q=90&auto=format" alt="Grace's fresh natural juices" className="hero-img" loading="eager"/>
+            <div className="hero-shine"/>
           </div>
+          <div className="fcard fc1"><span className="fi">✨</span><div><div className="fn">100%</div><div className="fl">Natural</div></div></div>
+          <div className="fcard fc2"><span className="fi">🚚</span><div><div className="fn">Free</div><div className="fl">Delivery</div></div></div>
+          <div className="fcard fc3"><span className="live-dot"/><span className="live-txt">Available Now</span></div>
         </div>
       </div>
     </section>
   );
 }
 
-// ── JUICE CARDS ──────────────────────────────────────────────────────────
-function JuiceCard({ juice, index }) {
-  const [ref, inView] = useInView();
+/* ── WHY US ─────────────────────────────────────────── */
+function WhyUs() {
+  const [ref, v] = useInView(0.1);
+  const items = [
+    { i:<IconLeaf s={22}/>, t:'Zero Additives', d:'No preservatives, no colourants, no flavourings. What you taste is pure fruit.' },
+    { i:<IconTruck s={22}/>, t:'Doorstep Delivery', d:'Grace delivers fresh to your home or office across Yaoundé Simbock.' },
+    { i:<IconCal s={22}/>, t:'Events & Bulk', d:'Weddings, birthdays, seminars — large quantities at great prices.' },
+    { i:<IconGlass s={22}/>, t:'Made to Order', d:'Every juice pressed fresh when you order. Maximum flavour every time.' },
+  ];
   return (
-    <div
-      ref={ref}
-      className={`juice-card${inView ? ' visible' : ''}`}
-      style={{ '--accent': juice.color, '--card-bg': juice.bg, animationDelay: `${index * 0.08}s` }}
-    >
-      {juice.tag && <span className="juice-tag">{juice.tag}</span>}
-      <div className="juice-emoji">{juice.emoji}</div>
-      <h3 className="juice-name">{juice.name}</h3>
-      <p className="juice-desc">{juice.description}</p>
-      <div className="juice-footer">
-        <span className="juice-price">{juice.price}</span>
-        <a
-          href={whatsappLink(`Hello Grace! I'd like to order a ${juice.name} 🍹`)}
-          target="_blank"
-          rel="noreferrer"
-          className="btn btn-order"
-        >
-          Order <WaIcon />
-        </a>
+    <section className="why-section" ref={ref}>
+      <div className="why-grid">
+        {items.map((it,i)=>(
+          <div key={it.t} className={`why-card${v?' wv':''}`} style={{transitionDelay:`${i*80}ms`}}>
+            <div className="why-ico">{it.i}</div>
+            <h3 className="why-t">{it.t}</h3>
+            <p className="why-d">{it.d}</p>
+          </div>
+        ))}
       </div>
-    </div>
+    </section>
+  );
+}
+
+/* ── JUICE CARD ─────────────────────────────────────── */
+function JuiceCard({ juice, delay }) {
+  const [ref, v] = useInView(0.08);
+  return (
+    <article ref={ref} className={`jcard${v?' jv':''}`} style={{'--acc':juice.color,'--lgt':juice.light,'--bdr':juice.border,'--dly':`${delay}ms`}}>
+      <div className="jimg-wrap">
+        <img src={juice.img} alt={juice.name} className="jimg" loading="lazy"/>
+        <div className="jimg-ov"/>
+        {juice.badge && <span className="jbadge" style={{background:juice.badgeColor}}>{juice.badge}</span>}
+        <div className="jemoji-float">{juice.emoji}</div>
+      </div>
+      <div className="jbody">
+        <div className="jmeta">
+          <h3 className="jname">{juice.name}</h3>
+          <span className="jtag">{juice.tagline}</span>
+        </div>
+        <p className="jdesc">{juice.desc}</p>
+        <div className="jfoot">
+          <div className="jprice">
+            <span className="pfrom">From</span>
+            <span className="pval">{juice.priceRange}</span>
+          </div>
+          <a href={wa(`Hello Grace! I'd like to order a ${juice.name} 🍹`)} target="_blank" rel="noreferrer" className="jbtn">
+            <IconWA s={13}/> Order
+          </a>
+        </div>
+      </div>
+    </article>
   );
 }
 
 function Juices() {
-  const [ref, inView] = useInView(0.1);
+  const [ref, v] = useInView(0.1);
   return (
-    <section className="section juices-section" id="juices">
-      <div className="section-header" ref={ref}>
-        <span className={`section-label${inView ? ' visible' : ''}`}>Our Menu</span>
-        <h2 className={`section-title${inView ? ' visible' : ''}`}>
-          Nature's Finest,<br /><em>Freshly Pressed</em>
-        </h2>
-        <p className={`section-sub${inView ? ' visible' : ''}`}>
-          Every bottle is made to order — no concentrates, no additives, just pure fruit.
-        </p>
+    <section className="section juices-sec" id="juices">
+      <div className="sec-hdr" ref={ref}>
+        <span className={`sec-label${v?' sv':''}`}><IconGlass s={13}/> Our Menu</span>
+        <h2 className={`sec-title${v?' sv':''}`}>Pressed with <em>Pure Love</em></h2>
+        <p className={`sec-sub${v?' sv':''}`}>Every bottle made to order — no concentrates, no preservatives, no shortcuts. Just the fruit, just the goodness.</p>
       </div>
-      <div className="juices-grid">
-        {juices.map((j, i) => <JuiceCard key={j.id} juice={j} index={i} />)}
-      </div>
-      <div className="juices-note">
-        🍓 Can't find your favourite? Grace makes <strong>any fruit combination</strong> on request!{' '}
-        <a href={whatsappLink('Hello Grace! Can you make a custom juice for me?')} target="_blank" rel="noreferrer">
-          Ask on WhatsApp →
+      <div className="j-grid">{JUICES.map((j,i)=><JuiceCard key={j.id} juice={j} delay={i*65}/>)}</div>
+      <div className="j-note-row">
+        <div className="j-note-txt"><span>🍓</span><span>Can't find your favourite? Grace makes <strong>any fruit combination</strong> on request!</span></div>
+        <a href={wa('Hello Grace! Can you make a custom juice blend for me? 🍹')} target="_blank" rel="noreferrer" className="btn btn-outline">
+          Request Custom Blend <IconArr s={13}/>
         </a>
       </div>
     </section>
   );
 }
 
-// ── EVENTS SECTION ───────────────────────────────────────────────────────
+/* ── EVENTS ─────────────────────────────────────────── */
 function Events() {
-  const [ref, inView] = useInView();
+  const [ref, v] = useInView(0.1);
+  const types = [{e:'🎂',l:'Birthday Parties'},{e:'💍',l:'Weddings'},{e:'🏢',l:'Corporate Events'},{e:'🏫',l:'Schools & Churches'},{e:'🎊',l:'Private Parties'},{e:'🤝',l:'Any Occasion'}];
+  const perks = ['Bulk pricing available','Custom quantities','Variety of flavours','On-time delivery'];
   return (
-    <section className="section events-section" id="events">
-      <div className="events-inner" ref={ref}>
-        <div className={`events-text${inView ? ' visible' : ''}`}>
-          <span className="section-label">Big Orders</span>
-          <h2 className="section-title">
-            Juice for Your<br /><em>Events & Occasions</em>
-          </h2>
-          <p className="events-desc">
-            Planning a birthday, wedding, seminar, or any big celebration? Grace provides
-            <strong> large-quantity, bulk juice orders</strong> for events across Yaoundé.
-            Fresh, natural, and crowd-pleasing every time.
-          </p>
-          <ul className="events-list">
-            <li>🎂 Birthday parties</li>
-            <li>💍 Weddings &amp; ceremonies</li>
-            <li>🏢 Corporate events &amp; seminars</li>
-            <li>🏫 School &amp; church gatherings</li>
-            <li>🎉 Any big occasion!</li>
-          </ul>
-          <a
-            href={whatsappLink("Hello Grace! I'd like to order juice in large quantity for an event 🎉")}
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-primary"
-          >
-            <WaIcon /> Request a Bulk Quote
-          </a>
+    <section className="section events-sec" id="events" ref={ref}>
+      <div className={`ev-wrap${v?' ev-vis':''}`}>
+        <div className="ev-img-col">
+          <div className="ev-img-frame">
+            {/* REPLACE: swap with a real event/bulk juice photo */}
+            <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=700&q=85&auto=format" alt="Bulk juice for events" className="ev-img" loading="lazy"/>
+            <div className="ev-img-ov"/>
+            <div className="ev-stat"><div className="ev-stat-n">50+</div><div className="ev-stat-l">Events Served</div></div>
+          </div>
         </div>
-        <div className={`events-visual${inView ? ' visible' : ''}`}>
-          {/* REPLACE: swap this with a real event/bulk juice photo */}
-          <img
-            src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&q=80"
-            alt="Bulk juice for events"
-            className="events-img"
-          />
-          <div className="events-img-tag">🎉 Events & Bulk Orders</div>
+        <div className="ev-content">
+          <span className="sec-label sv"><IconCal s={13}/> Bulk Orders</span>
+          <h2 className="sec-title sv">Juice for Your<br/><em>Big Occasions</em></h2>
+          <p className="ev-desc">Planning something special? Grace provides large-quantity freshly-pressed juices for any event across Yaoundé. <strong>Professional service, natural quality, delivered on time.</strong></p>
+          <div className="ev-types">{types.map(t=><div key={t.l} className="ev-chip"><span>{t.e}</span>{t.l}</div>)}</div>
+          <div className="ev-perks">{perks.map(p=><div key={p} className="ev-perk"><span className="pck"><IconCheck s={12}/></span>{p}</div>)}</div>
+          <a href={wa("Hello Grace! I'd like to order juice in large quantity for an event 🎉")} target="_blank" rel="noreferrer" className="btn btn-wa">
+            <IconWA s={18}/> Request a Bulk Quote
+          </a>
         </div>
       </div>
     </section>
   );
 }
 
-// ── DELIVERY SECTION ─────────────────────────────────────────────────────
+/* ── DELIVERY ───────────────────────────────────────── */
 function Delivery() {
-  const [ref, inView] = useInView();
+  const [ref, v] = useInView(0.1);
+  const steps = [
+    { n:'01', i:<IconWA s={20}/>, t:'Message Grace', d:'Send your order via WhatsApp with what you want and your location.' },
+    { n:'02', i:<IconGlass s={20}/>, t:'Freshly Pressed', d:'Grace presses your juice fresh the moment your order is confirmed.' },
+    { n:'03', i:<IconTruck s={20}/>, t:'Delivered to You', d:'Your juice arrives cold and fresh, straight to your door.' },
+  ];
   return (
-    <section className="section delivery-section" id="delivery" ref={ref}>
-      <div className={`delivery-card${inView ? ' visible' : ''}`}>
-        <div className="delivery-icon">🚚</div>
-        <h2 className="delivery-title">We Come To <em>You</em></h2>
-        <p className="delivery-desc">
-          Grace doesn't have a physical shop — but that's the beauty of it!
-          She brings the freshness straight to your doorstep anywhere in
-          <strong> Yaoundé Simbock</strong> and surrounding areas.
-        </p>
-        <div className="delivery-steps">
-          <div className="d-step">
-            <span className="d-step-num">1</span>
-            <span>Send a WhatsApp message with your order</span>
+    <section className="section delivery-sec" id="delivery" ref={ref}>
+      <div className="sec-hdr">
+        <span className={`sec-label${v?' sv':''}`}><IconTruck s={13}/> How It Works</span>
+        <h2 className={`sec-title${v?' sv':''}`}>Fresh Juice,<br/><em>At Your Door</em></h2>
+        <p className={`sec-sub${v?' sv':''}`}>No shop, no problem. You get <strong>fresher juice than any shelf</strong> could offer — straight from Grace's hands to yours.</p>
+      </div>
+      <div className={`d-steps${v?' d-vis':''}`}>
+        {steps.map((s,i)=>(
+          <div key={s.n} className="d-step" style={{transitionDelay:`${i*110}ms`}}>
+            <div className="d-step-top">
+              <div className="d-num">{s.n}</div>
+              <div className="d-ico">{s.i}</div>
+              {i<steps.length-1 && <div className="d-line"/>}
+            </div>
+            <h3 className="d-t">{s.t}</h3>
+            <p className="d-d">{s.d}</p>
           </div>
-          <div className="d-arrow">→</div>
-          <div className="d-step">
-            <span className="d-step-num">2</span>
-            <span>Grace prepares your juice fresh</span>
-          </div>
-          <div className="d-arrow">→</div>
-          <div className="d-step">
-            <span className="d-step-num">3</span>
-            <span>She delivers it to your location</span>
-          </div>
-        </div>
-        <a
-          href={whatsappLink('Hello Grace! I want to place a delivery order 🚚')}
-          target="_blank"
-          rel="noreferrer"
-          className="btn btn-primary"
-        >
-          <WaIcon /> Order Delivery Now
+        ))}
+      </div>
+      <div className={`d-cta${v?' d-vis':''}`} style={{transitionDelay:'360ms'}}>
+        <a href={wa('Hello Grace! I want to place a delivery order 🚚')} target="_blank" rel="noreferrer" className="btn btn-wa btn-lg">
+          <IconWA s={20}/> Order Delivery Now
+        </a>
+        <a href="tel:+237674681144" className="btn btn-phone btn-lg">
+          <IconPhone s={18}/> +237 674 681 144
         </a>
       </div>
     </section>
   );
 }
 
-// ── ORDER / CONTACT ──────────────────────────────────────────────────────
-function Order() {
-  const [ref, inView] = useInView();
+/* ── CONTACT ────────────────────────────────────────── */
+function Contact() {
+  const [ref, v] = useInView(0.1);
   return (
-    <section className="section order-section" id="order" ref={ref}>
-      <div className={`order-card${inView ? ' visible' : ''}`}>
-        <span className="section-label">Get In Touch</span>
-        <h2 className="section-title">
-          Ready to Order?<br /><em>Reach Grace Directly</em>
-        </h2>
-        <p className="order-desc">
-          The fastest way to order is via <strong>WhatsApp</strong>.
-          Grace personally handles every order with care and love. 💚
-        </p>
-        <div className="contact-buttons">
-          <a
-            href={whatsappLink('Hello Grace! I want to order a fresh juice 🍹')}
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-wa btn-lg"
-          >
-            <WaIcon /> Chat on WhatsApp
-          </a>
-          <a
-            href="tel:+237674681144"
-            className="btn btn-call btn-lg"
-          >
-            📞 Call: +237 674 681 144
-          </a>
+    <section className="section contact-sec" id="contact" ref={ref}>
+      <div className={`contact-card${v?' cv':''}`}>
+        <div className="contact-l">
+          <span className="sec-label sv"><IconPhone s={13}/> Get In Touch</span>
+          <h2 className="sec-title sv">Ready to<br/><em>Order?</em></h2>
+          <p className="contact-desc">The fastest way to order is WhatsApp. Grace personally handles every order with care. 💚</p>
+          <div className="contact-loc"><IconMap s={15}/><span>Yaoundé, Simbock — delivery available nearby</span></div>
+          <p className="contact-hrs">⏰ Available <strong>7 days a week</strong>, 7 AM – 9 PM</p>
         </div>
-        <div className="order-location">
-          <span>📍</span>
-          <span>Based in <strong>Yaoundé, Simbock</strong> — Delivery available nearby</span>
+        <div className="contact-r">
+          <a href={wa('Hello Grace! I want to order a fresh juice 🍹')} target="_blank" rel="noreferrer" className="btn btn-wa btn-xl cwa">
+            <IconWA s={24}/>
+            <div><div className="bxm">Chat on WhatsApp</div><div className="bxs">+237 674 681 144</div></div>
+          </a>
+          <a href="tel:+237674681144" className="btn btn-phone btn-xl ccl">
+            <IconPhone s={24}/>
+            <div><div className="bxm">Call Grace</div><div className="bxs">+237 674 681 144</div></div>
+          </a>
         </div>
       </div>
     </section>
   );
 }
 
-// ── FOOTER ────────────────────────────────────────────────────────────────
+/* ── FOOTER ─────────────────────────────────────────── */
 function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-inner">
-        <div className="footer-brand">
-          <span className="brand-leaf">🍃</span>
-          <span className="brand-name">Grace's<em> Juices</em></span>
+      <div className="footer-wrap">
+        <div className="footer-top">
+          <div className="footer-brand"><span className="fb-ico"><IconLeaf s={20}/></span><span>Grace's<em> Juices</em></span></div>
+          <p className="footer-tag">Fresh. Natural. Delivered with Love.<br/>Yaoundé, Simbock 🇨🇲</p>
+          <div className="footer-links">
+            <a href={wa('Hello Grace!')} target="_blank" rel="noreferrer" className="footer-btn"><IconWA s={16}/> WhatsApp</a>
+            <a href="tel:+237674681144" className="footer-btn"><IconPhone s={16}/> Call</a>
+          </div>
         </div>
-        <p className="footer-tagline">
-          Fresh. Natural. Delivered with Love — Yaoundé, Simbock 🇨🇲
-        </p>
-        <div className="footer-links">
-          <a href={whatsappLink('Hello Grace!')} target="_blank" rel="noreferrer">
-            <WaIcon /> WhatsApp
-          </a>
-          <a href="tel:+237674681144">📞 +237 674 681 144</a>
+        <div className="footer-div"/>
+        <div className="footer-bot">
+          <p>© {new Date().getFullYear()} Grace's Natural Juices. All rights reserved.</p>
+          <p className="footer-made">Made with 💚 in Cameroon</p>
         </div>
-        <p className="footer-copy">© {new Date().getFullYear()} Grace's Natural Juices. All rights reserved.</p>
       </div>
     </footer>
   );
 }
 
-// ── WHATSAPP FLOAT BUTTON ────────────────────────────────────────────────
-function WaFloat() {
+/* ── WA FLOAT ───────────────────────────────────────── */
+function WAFloat() {
+  const [show, setShow] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setShow(true), 2200); return () => clearTimeout(t); }, []);
   return (
-    <a
-      href={whatsappLink('Hello Grace! I want to order a fresh juice 🍹')}
-      target="_blank"
-      rel="noreferrer"
-      className="wa-float"
-      title="Order on WhatsApp"
-    >
-      <WaIcon />
+    <a href={wa('Hello Grace! I want to order a fresh juice 🍹')} target="_blank" rel="noreferrer" className={`wa-float${show?' wf-show':''}`} aria-label="Order on WhatsApp">
+      <span className="wf-pulse"/>
+      <IconWA s={26}/>
     </a>
   );
 }
 
-// ── WA ICON ──────────────────────────────────────────────────────────────
-function WaIcon() {
-  return (
-    <svg viewBox="0 0 32 32" fill="currentColor" width="20" height="20" aria-hidden="true">
-      <path d="M16 0C7.163 0 0 7.163 0 16c0 2.826.737 5.48 2.027 7.789L0 32l8.432-2.009A15.94 15.94 0 0016 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.28 13.28 0 01-6.777-1.853l-.485-.29-5.007 1.194 1.227-4.868-.317-.5A13.283 13.283 0 012.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.261-9.84c-.4-.2-2.363-1.165-2.729-1.298-.366-.133-.632-.2-.898.2-.266.4-1.032 1.298-1.265 1.565-.233.266-.466.3-.866.1-.4-.2-1.688-.622-3.214-1.982-1.188-1.059-1.99-2.368-2.222-2.768-.233-.4-.025-.616.175-.815.18-.18.4-.466.6-.7.2-.233.266-.4.4-.666.133-.267.067-.5-.033-.7-.1-.2-.898-2.167-1.232-2.967-.324-.78-.654-.674-.898-.686l-.765-.013c-.266 0-.7.1-1.066.5-.366.4-1.4 1.366-1.4 3.333s1.433 3.867 1.633 4.133c.2.267 2.82 4.306 6.833 6.033.955.413 1.7.659 2.281.843.958.305 1.83.262 2.52.159.769-.114 2.363-.966 2.696-1.9.333-.933.333-1.733.233-1.9-.1-.167-.366-.267-.766-.467z"/>
-    </svg>
-  );
-}
-
-// ── APP ────────────────────────────────────────────────────────────────────
 export default function App() {
   return (
     <div className="app">
-      <Navbar />
-      <Hero />
-      <Juices />
-      <Events />
-      <Delivery />
-      <Order />
-      <Footer />
-      <WaFloat />
+      <Navbar/>
+      <main><Hero/><WhyUs/><Juices/><Events/><Delivery/><Contact/></main>
+      <Footer/>
+      <WAFloat/>
     </div>
   );
 }
