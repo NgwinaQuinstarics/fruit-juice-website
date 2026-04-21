@@ -4,28 +4,138 @@ import './App.css';
 const WA = '237674681144';
 const wa = (msg) => `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
 
+import mango from './assets/images/mango.jpg';
+import pawpaw from './assets/images/pawpaw.jpg';
+import carrot from './assets/images/carrot.jpg';
+import guava from './assets/images/guava.jpg';
+import pineapple from './assets/images/pineapple.jpg';
+import soursop from './assets/images/soursalt.jpg'; 
+
+
 const JUICES = [
-  { id:1, name:'Watermelon Burst', tagline:'Hydrating & cooling', desc:'Sweet, ripe watermelon cold-pressed to keep every drop of goodness alive.', priceRange:'500 – 1,500 FCFA', color:'#d94f5c', light:'#fdf0f1', border:'rgba(217,79,92,0.15)', emoji:'🍉', img:'https://images.unsplash.com/photo-1589733955941-5eeaf752f6dd?w=600&q=85&auto=format', badge:'Best Seller', badgeColor:'#d94f5c' },
-  { id:2, name:'Golden Mango', tagline:'Rich & velvety', desc:'Sun-ripened Cameroonian mangoes blended into liquid gold. Thick and dreamy.', priceRange:'500 – 1,500 FCFA', color:'#e8901a', light:'#fff9ee', border:'rgba(232,144,26,0.15)', emoji:'🥭', img:'https://images.unsplash.com/photo-1546173159-315724a31696?w=600&q=85&auto=format', badge:'Fan Favourite', badgeColor:'#e8901a' },
-  { id:3, name:'Citrus Sunrise', tagline:'Bright & zesty', desc:'Fresh-squeezed oranges and a hint of lemon. A vitamin C powerhouse for your morning.', priceRange:'500 – 1,500 FCFA', color:'#d97706', light:'#fffbf0', border:'rgba(217,119,6,0.15)', emoji:'🍊', img:'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=600&q=85&auto=format', badge:null, badgeColor:null },
-  { id:4, name:'Tropical Pineapple', tagline:'Tangy & digestive', desc:'Fresh pineapple with a natural tang. Great for digestion and a natural energy lift.', priceRange:'500 – 1,500 FCFA', color:'#b5890a', light:'#fefce8', border:'rgba(181,137,10,0.15)', emoji:'🍍', img:'https://images.unsplash.com/photo-1453830906880-1b7d53e4ea29?w=600&q=85&auto=format', badge:null, badgeColor:null },
-  { id:5, name:'Ginger Lemon Boost', tagline:'Spicy immune booster', desc:'Raw ginger, fresh lemon and a touch of honey. Your daily wellness ritual in a glass.', priceRange:'500 – 1,500 FCFA', color:'#15803d', light:'#f0fdf4', border:'rgba(21,128,61,0.15)', emoji:'🍋', img:'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&q=85&auto=format', badge:'Healthy Pick', badgeColor:'#15803d' },
-  { id:6, name:'Passion Fruit Mix', tagline:'Exotic & floral', desc:'A blended medley of passion fruit and seasonal favourites. Unique and vibrant every time.', priceRange:'500 – 2,000 FCFA', color:'#7c3aed', light:'#faf5ff', border:'rgba(124,58,237,0.15)', emoji:'🍇', img:'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=600&q=85&auto=format', badge:"Chef's Special", badgeColor:'#7c3aed' },
+  {
+    id:1,
+    name:'Watermelon Burst',
+    tagline:'Hydrating & cooling',
+    desc:'Sweet, ripe watermelon cold-pressed to keep every drop of goodness alive.',
+    priceRange:'500 – 1,500 FCFA',
+    color:'#d94f5c',
+    light:'#fdf0f1',
+    border:'rgba(217,79,92,0.15)',
+    emoji:'🍉',
+    img:mango, 
+    badge:'Best Seller',
+    badgeColor:'#d94f5c'
+  },
+  {
+    id:2,
+    name:'Golden Mango',
+    tagline:'Rich & velvety',
+    desc:'Sun-ripened Cameroonian mangoes blended into liquid gold. Thick and dreamy.',
+    priceRange:'500 – 1,500 FCFA',
+    color:'#e8901a',
+    light:'#fff9ee',
+    border:'rgba(232,144,26,0.15)',
+    emoji:'🥭',
+    img:pawpaw,
+    badge:'Fan Favourite',
+    badgeColor:'#e8901a'
+  },
+  {
+    id:3,
+    name:'Carrot Juice',
+    tagline:'Bright & healthy',
+    desc:'Fresh carrot juice packed with vitamins and natural energy.',
+    priceRange:'500 – 1,500 FCFA',
+    color:'#d97706',
+    light:'#fffbf0',
+    border:'rgba(217,119,6,0.15)',
+    emoji:'🥕',
+    img:carrot,
+    badge:null,
+    badgeColor:null
+  },
+  {
+    id:4,
+    name:'Tropical Pineapple',
+    tagline:'Tangy & digestive',
+    desc:'Fresh pineapple juice with natural tropical sweetness.',
+    priceRange:'500 – 1,500 FCFA',
+    color:'#b5890a',
+    light:'#fefce8',
+    border:'rgba(181,137,10,0.15)',
+    emoji:'🍍',
+    img:guava,
+    badge:null,
+    badgeColor:null
+  },
+  {
+    id:5,
+    name:'Pink Guava Bliss',
+    tagline:'Fragrant & tropical',
+    desc:'Sweet pink guava juice, smooth and refreshing.',
+    priceRange:'500 – 1,500 FCFA',
+    color:'#be185d',
+    light:'#fdf2f8',
+    border:'rgba(190,24,93,0.15)',
+    emoji:'🍐',
+    img:pineapple,
+    badge:'Healthy Pick',
+    badgeColor:'#be185d'
+  },
+  {
+    id:6,
+    name:'Creamy Soursop',
+    tagline:'Exotic & healthy',
+    desc:'Natural soursop juice rich in nutrients and creamy taste.',
+    priceRange:'500 – 2,000 FCFA',
+    color:'#15803d',
+    light:'#f0fdf4',
+    border:'rgba(21,128,61,0.15)',
+    emoji:'🍏',
+    img:soursop,
+    badge:"Chef's Special",
+    badgeColor:'#15803d'
+  },
 ];
 
-const TICKER = ['🍉 Watermelon Burst','🥭 Golden Mango','🍊 Citrus Sunrise','🍍 Tropical Pineapple','🍋 Ginger Lemon Boost','🍇 Passion Fruit Mix','✨ 100% Natural','🚚 Delivery Available','🎉 Bulk Event Orders','🌿 Zero Preservatives','💚 Made Fresh Daily'];
+const TICKER = [
+  '🍉 Watermelon Burst',
+  '🥭 Golden Mango',
+  '🥕 Carrot Juice',
+  '🍍 Tropical Pineapple',
+  '🍐 Pink Guava Bliss',
+  '🍏 Creamy Soursop',
+  '✨ 100% Natural',
+  '🚚 Delivery Available',
+  '🎉 Bulk Event Orders',
+  '🌿 Zero Preservatives',
+  '💚 Made Fresh Daily'
+];
 
 function useInView(threshold = 0.12) {
   const ref = useRef(null);
   const [v, setV] = useState(false);
+
   useEffect(() => {
-    const el = ref.current; if (!el) return;
-    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setV(true); obs.disconnect(); } }, { threshold });
+    const el = ref.current;
+    if (!el) return;
+
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        setV(true);
+        obs.disconnect();
+      }
+    }, { threshold });
+
     obs.observe(el);
     return () => obs.disconnect();
   }, [threshold]);
+
   return [ref, v];
 }
+
+
 
 /* SVG Icons */
 const IconWA = ({ s = 20 }) => (
@@ -61,7 +171,7 @@ function Navbar() {
         <div className="nb-wrap">
           <a href="#top" className="nb-brand" onClick={close}>
             <span className="nb-brand-icon"><IconLeaf s={16}/></span>
-            <span>Grace's<em> Juices</em></span>
+            <span>Grace<em> Juice</em></span>
           </a>
           <ul className={`nb-links${open?' open':''}`}>
             {links.map(l => <li key={l.label}><a href={l.href} className="nb-link" onClick={close}>{l.label}</a></li>)}
