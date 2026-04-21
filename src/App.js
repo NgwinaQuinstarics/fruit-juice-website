@@ -4,11 +4,11 @@ import './App.css';
 const WA = '237674681144';
 const wa = (msg) => `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
 
-import mango from './assets/images/mango.jpg';
-import pawpaw from './assets/images/pawpaw.jpg';
+import mango from './assets/images/watermelon.jpg';
+import pawpaw from './assets/images/mango.jpg';
 import carrot from './assets/images/carrot.jpg';
-import guava from './assets/images/guava.jpg';
-import pineapple from './assets/images/pineapple.jpg';
+import guava from './assets/images/pineapple.jpg';
+import pineapple from './assets/images/guava.jpg';
 import soursop from './assets/images/soursalt.jpg'; 
 
 
@@ -26,6 +26,7 @@ const JUICES = [
     img:mango, 
     badge:'Best Seller',
     badgeColor:'#d94f5c'
+    
   },
   {
     id:2,
@@ -37,7 +38,7 @@ const JUICES = [
     light:'#fff9ee',
     border:'rgba(232,144,26,0.15)',
     emoji:'🥭',
-    img:pawpaw,
+    img:mango,
     badge:'Fan Favourite',
     badgeColor:'#e8901a'
   },
@@ -65,7 +66,7 @@ const JUICES = [
     light:'#fefce8',
     border:'rgba(181,137,10,0.15)',
     emoji:'🍍',
-    img:guava,
+    img:pineapple,
     badge:null,
     badgeColor:null
   },
@@ -79,7 +80,7 @@ const JUICES = [
     light:'#fdf2f8',
     border:'rgba(190,24,93,0.15)',
     emoji:'🍐',
-    img:pineapple,
+    img:guava,
     badge:'Healthy Pick',
     badgeColor:'#be185d'
   },
