@@ -4,11 +4,11 @@ import './App.css';
 const WA = '237674681144';
 const wa = (msg) => `https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
 
-import mango from './assets/images/watermelon.jpg';
-import pawpaw from './assets/images/mango.jpg';
+import watermelon from './assets/images/watermelon.jpg';
+import mango from './assets/images/mango.jpg';
 import carrot from './assets/images/carrot.jpg';
-import guava from './assets/images/pineapple.jpg';
-import pineapple from './assets/images/guava.jpg';
+import pineapple from './assets/images/pineapple.jpg';
+import guava from './assets/images/guava.jpg';
 import soursop from './assets/images/soursalt.jpg'; 
 
 
@@ -23,10 +23,10 @@ const JUICES = [
     light:'#fdf0f1',
     border:'rgba(217,79,92,0.15)',
     emoji:'🍉',
-    img:mango, 
+    img:watermelon, 
     badge:'Best Seller',
     badgeColor:'#d94f5c'
-    
+
   },
   {
     id:2,
